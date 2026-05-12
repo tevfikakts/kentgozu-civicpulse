@@ -1,0 +1,58 @@
+services:
+  postgres:
+    build: .
+    container_name: kentgozu-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "ChangeMe_Strong_2026!"
+      POSTGRES_DB: kentgozu
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  postgres-init:
+    image: pgvector/pgvector:pg17
+    container_name: kentgozu-postgres-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: "ChangeMe_Strong_2026!"
+    command: >
+      sh -c "psql -h postgres -U postgres -d kentgozu -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
+      psql -h postgres -U postgres -d kentgozu -c 'CREATE EXTENSION IF NOT EXISTS vector;' &&
+      psql -h postgres -U postgres -d kentgozu -c 'CREATE TABLE IF NOT EXISTS _vector_srid_probe (id bigserial primary key, embedding vector(768), location geometry(Point,4326));'"
+    restart: "no"
+
+  redis:
+    image: redis:alpine
+    container_name: kentgozu-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+volumes:
+  pgdata:
+  redisdata:

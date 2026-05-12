@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: kentgozu
+  datasource:
+    url: jdbc:postgresql://postgres:5432/kentgozu
+    username: postgres
+    password: ChangeMe_Strong_2026!
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 20000
+      max-lifetime: 1800000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  ai:
+    vertex:
+      ai:
+        gemini:
+          enabled: true
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
