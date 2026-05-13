@@ -1,10 +1,16 @@
 spring:
   application:
     name: kentgozu
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
   datasource:
-    url: jdbc:postgresql://postgres:5432/kentgozu
+    url: jdbc:postgresql://localhost:5432/kentgozu
     username: postgres
     password: ChangeMe_Strong_2026!
+    driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -13,12 +19,12 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+      ddl-auto: update
   ai:
+    google:
+      genai:
+        api-key: AIzaSyDUMMY00000000000000000000000000000
+        vertex-ai: false
     vertex:
       ai:
         gemini:
@@ -29,3 +35,31 @@ spring:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 768
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      postgisSpatial:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        slowCallRateThreshold: 60
+        slowCallDurationThreshold: 3s
+        waitDurationInOpenState: 15s
+        permittedNumberOfCallsInHalfOpenState: 5
+  timelimiter:
+    instances:
+      postgisSpatial:
+        timeoutDuration: 3s
+
+kentgozu:
+  security:
+    jwt:
+      # Production: set JWT_SECRET env var; HS256 needs at least 32 bytes.
+      secret: ${JWT_SECRET:local-development-only-min-32-chars-________}
+      issuer: kentgozu
+      access-token-validity-seconds: 3600
+      public-paths:
+        - /api/v1/auth/**
+        - /api/auth/**
+        - /error
