@@ -62,6 +62,15 @@ public class Ticket {
 	@Column(columnDefinition = "vector(768)")
 	private float[] embedding;
 
+	@Column(length = 64)
+	private String category;
+
+	@Column(name = "urgency_score")
+	private Integer urgencyScore;
+
+	@Column(name = "vision_summary", columnDefinition = "text")
+	private String visionSummary;
+
 	@Column(nullable = false, updatable = false)
 	private Instant createdAt;
 

@@ -18,8 +18,12 @@ spring:
       max-lifetime: 1800000
   jpa:
     show-sql: true
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
+  sql:
+    init:
+      mode: always
   ai:
     google:
       genai:
@@ -51,6 +55,12 @@ resilience4j:
     instances:
       postgisSpatial:
         timeoutDuration: 3s
+  ratelimiter:
+    instances:
+      geminiRateLimiter:
+        limit-for-period: 15
+        limit-refresh-period: 1m
+        timeout-duration: 60s
 
 kentgozu:
   security:
