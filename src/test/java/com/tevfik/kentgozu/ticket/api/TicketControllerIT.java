@@ -79,7 +79,7 @@ class TicketControllerIT {
 	@DisplayName("2) Geçersiz status ile 400 ve açıklayıcı mesaj")
 	void createTicket_withInvalidStatus_returns400() throws Exception {
 		Map<String, Object> body = validTicketBody();
-		body.put("status", "OPEN");
+		body.put("status", "NOT_A_VALID_TICKET_STATUS");
 		mockMvc.perform(post("/api/tickets")
 						.header(HttpHeaders.AUTHORIZATION, bearerToken())
 						.contentType(MediaType.APPLICATION_JSON)
